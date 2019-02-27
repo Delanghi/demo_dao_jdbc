@@ -28,8 +28,7 @@ public class SellerDaoJDBC implements SellerDao {
 		
 	 // IMPLEMENTAÇÃO DOS MÉTODOS
 		@Override
-		public void insert(Seller obj) {
-			
+		public void insert(Seller obj) {			
 			PreparedStatement st = null;
 			try {				
 				st = conn.prepareStatement(
@@ -65,7 +64,29 @@ public class SellerDaoJDBC implements SellerDao {
 		}
 
 		@Override
-		public void update(Seller obj) {		
+		public void update(Seller obj) {	
+			PreparedStatement st = null;
+			try {				
+				st = conn.prepareStatement(
+					"UPDATE seller "
+					+ "SET Name = ?, Email = ?, BirthDate = ?, BaseSalary = ?, DepartmentId = ? "
+					+ "WHERE Id = ? " );
+				
+				st.setString(1, obj.getName());
+				st.setString(2, obj.getEmail());
+				st.setDate(3, new java.sql.Date(obj.getBirthDate().getTime()));		//INSTANCIAR uma data do SQL
+				st.setDouble(4, obj.getBaseSalary());
+				st.setInt(5, obj.getDepartment().getId());					// 1º acessa o depto; depois pega o ID
+				st.setInt(6, obj.getId()); 									// para apanhar nº ID
+				
+				st.executeUpdate();											// "int rowsAffected" foi considerado acima
+					
+			} catch (SQLException e) {
+				throw new DbException(e.getMessage());
+			}
+			finally {
+				DB.closeStatement(st);
+			}
 		}
 
 		@Override
